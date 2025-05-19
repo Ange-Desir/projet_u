@@ -42,4 +42,4 @@ def load_and_prepare_data(uploaded_file, sheet_name):
         st.error(f"Erreur de chargement : {str(e)}")
         return None
 
-[... le reste du code reste inchangé ...]
+
