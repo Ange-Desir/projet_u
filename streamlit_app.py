@@ -1,3 +1,6 @@
+import os
+os.system('pip install seaborn pandas matplotlib openpyxl --quiet')
+
 import streamlit as st
 import pandas as pd
 import seaborn as sns
@@ -10,26 +13,26 @@ uploaded_file = st.file_uploader("Téléversez un fichier Excel (Producteurs ou 
 
 if uploaded_file:
     sheet_names = pd.ExcelFile(uploaded_file).sheet_names
-    sheet = st.selectbox("Sélectionnez la feuille", options=sheet_names)
-    df = pd.read_excel(uploaded_file, sheet_name=sheet)
+    sheet = st.selectbox("Sélectionnez la feuille", options=sheet_names, key="sheet_select")
+    df = pd.read_excel(uploaded_file, sheet_name=sheet, engine="openpyxl")
     st.write("Aperçu des données")
     st.dataframe(df.head())
 
-    if st.checkbox("Afficher les statistiques descriptives"):
+    if st.checkbox("Afficher les statistiques descriptives", key="desc_checkbox"):
         st.write(df.describe(include="all"))
 
     numeric_cols = df.select_dtypes(include='number').columns.tolist()
     if numeric_cols:
         st.subheader("Analyse univariée")
-        num_col = st.selectbox("Choisir une variable numérique", numeric_cols)
+        num_col = st.selectbox("Variable numérique pour analyse univariée", numeric_cols, key="univar_select")
         sns.histplot(df[num_col], kde=True)
         st.pyplot(plt)
 
     cat_cols = df.select_dtypes(include='object').columns.tolist()
     if numeric_cols and cat_cols:
         st.subheader("Analyse bivariée")
-        cat_col = st.selectbox("Choisir une variable catégorielle", cat_cols)
-        num_col_bi = st.selectbox("Choisir une variable numérique", numeric_cols)
+        cat_col = st.selectbox("Variable catégorielle pour analyse bivariée", cat_cols, key="cat_select")
+        num_col_bi = st.selectbox("Variable numérique pour analyse bivariée", numeric_cols, key="bivar_select")
         sns.boxplot(x=df[cat_col], y=df[num_col_bi])
         plt.xticks(rotation=90)
         st.pyplot(plt)
